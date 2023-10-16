@@ -3,7 +3,7 @@
   "password": "Prosperida880319",
   "minBlockRate": 10,
   "minPayRatePerHour": 2,
-  "arrivalBuffer": 5,
+  "arrivalBuffer": 60,
   "desiredWarehouses": [
     "8e34fe29-a71c-4851-a178-8d12a71b37a4",
     "67c9bad7-4477-45a2-8d5d-872aa074b42d",
@@ -56,12 +56,12 @@
     "Sat",
     "Sunday"
   ],
-  "retryLimit": 30,
+  "retryLimit": 50,
   "refreshInterval": 10,
-  "twilioAcctSid": "AC73858e3516e5e7c43b111c4f6d54402d",
-  "twilioAuthToken": "caf282d05f6abd91caf97d7a2000fa3b",
-  "twilioFromNumber": "+18335013212",
-  "twilioToNumber": "+17143814243",
+  "twilioAcctSid": "ACd344fe0c8216ca15ddc3155987d4049f",
+  "twilioAuthToken": "d51b5356528f3cd26a366af114eaac06",
+  "twilioFromNumber": "+12105260895",
+  "twilioToNumber": "+14046188039",
   "refreshToken": "Atnr|EwICIOOE6WhP5M4HobyksfUB2C6EIbZmH8O6sTcFCK_I-xkBxfXLtBrIQxRHU70SG5mR2lLiCritDY9xYkQjT8oLUie9IqEYdCvCZhR5kSTo9RqLd6sbte0UFY4EVwWL3dPkLajCm0bnUHPnD1EkL5ZP0xa1Om0ht1S-IzwIYyghCIy9ziOx8V_ncBsg3_nSIAniG0zJvosYOg5WL0wU-5PJ5MsLEVlzlps4F0DKbOFksmYshwD9n_PZj6eQ_70v5mdq-cSEpVe6RVqt79i5V6FC8plbi2JB2gMdkEDZh1s8wLa5GQ",
-  "accessToken": "Atna|EwICIK195DOokAQ6htzFsR71PXKIPQJaglKrKXTWQFnJQ0S1eF3ZXbg52zVdmYjywZVeT3iJ51W0ZHeepcmmUcPJk_tQHc1taupX67-ajx-LcDQs0AHyovVI6sTQvKRosjuIzexyr7N54_RkI5A-vc8xq9ipViNYUoktY9suhabjFCyi6GPAvBraRZYkWPvMgcDPtWqZ7bUMP9WR9ZicYYGp7Aiv756vY0uFte1yPQDMYHpSJEREk5Qfk4pWO9QvVzWUlDA3crWMGFWMZRXEqQXpKkwDLbaMtrwLe5u6XE_ON2yyu87uCnk9K4a-mszvYNHQ6Ao"
+  "accessToken": "Atna|EwICIFR9bM-a0WiI2zhPsuPpWVhPPQxcZO44-VhC1CVHPAZu3hEZr_S8PZzpWvcN10DbCRMafwvbslZWH9RkHaBKyuCr2w2zXKpVmTYeHY0GD9HZR_EKQz0wK3SYuQKUyTmwATtnZ5fQnhbu4idaltBIqCzd7n5Ua7gWlmEo5YBxBMdgpoPZX4E66iHp3vsA8_Z00QlDn3j9oW_t51095gax7DXQgQSl9sKhJFRkQCnmCjnt010BT2wGbMWEEpMCPk7d9dwLU06bwc8nEDDHQubBBbUCOhmHhzsVjthB6FxhTkKg44E1uNqlJaGbxhVQ4eEcrfw"
 }

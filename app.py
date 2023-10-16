@@ -10,6 +10,9 @@ if __name__ == "__main__":
     if (arg1 == "getAllServiceAreas" or arg1 == "--w"):
       print("\n Your service area options:")
       print(flexUnlimited.getAllServiceAreas())
+    elif (arg1 == "--sms"):
+      print("\n Send SMS:")
+      print(flexUnlimited.sendSMS())
     else:
       Log.error("Invalid argument provided.")
   else:

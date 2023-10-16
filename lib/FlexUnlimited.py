@@ -364,6 +364,15 @@ class FlexUnlimited:
     for serviceArea in serviceAreaPoolList:
       serviceAreasTable.add_row([serviceArea["serviceAreaName"], serviceArea["serviceAreaId"]])
     return serviceAreasTable
+  
+  def sendSMS(self):
+    if self.twilioClient is not None:
+      self.twilioClient.messages.create(
+        to=self.twilioToNumber,
+        from_=self.twilioFromNumber,
+        body="Gotzilla come dinosaurios al 100")
+
+
 
   def __getOffers(self) -> Response:
     """
@@ -412,7 +421,7 @@ class FlexUnlimited:
 
   def __processOffer(self, offer: Offer):
     Log.info(offer.toString());
-    print(f"** Validating offer with your constrains {offer.ratePerHour}.\n\n")
+    print(f"** Validating offer with your constrains.\n\n")
     if offer.hidden:
       return
     if self.desiredWeekdays:
@@ -465,3 +474,4 @@ class FlexUnlimited:
       time.sleep(self.refreshInterval)
     Log.info("Job search cycle ending...")
     Log.info(f"Accepted {len(self.__acceptedOffers)} offers in {time.time() - self.__startTimestamp} seconds")
+
