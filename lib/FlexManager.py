@@ -29,7 +29,7 @@ MANUFACTURER = "LeMobile"
 OS_VERSION = "LeEco/Le2_NA/le_s2_na:6.0.1/IFXNAOP5801910272S/61:user/release-keys"
 
 
-class FlexUnlimited:
+class FlexManager:
     allHeaders = {
         "AmazonApiRequest": {
             "x-amzn-identity-auth-domain": "api.amazon.com",
@@ -70,47 +70,85 @@ class FlexUnlimited:
         "GetOfferFiltersOptions": "https://flex-capacity-na.amazon.com/getOfferFiltersOptions"
     }
 
-    def __init__(self) -> None:
+    def __init__(self, settings=None) -> None:
         try:
-            with open("config_old.json") as configFile:
-                config = json.load(configFile)
-                self.username = config["username"]
-                self.password = config["password"]
-                self.desiredWarehouses = config["desiredWarehouses"] if len(
-                    config["desiredWarehouses"]) >= 1 else []  # list of warehouse ids
-                self.minBlockRate = config["minBlockRate"]
-                self.minPayRatePerHour = config["minPayRatePerHour"]
-                # arrival buffer in minutes
-                self.arrivalBuffer = config["arrivalBuffer"]
-                # start time in military time
-                self.desiredStartTime = config["desiredStartTime"]
-                # end time in military time
-                self.desiredEndTime = config["desiredEndTime"]
-                self.desiredWeekdays = set()
-                # number of jobs retrieval requests to perform
-                self.retryLimit = config["retryLimit"]
-                # sets delay in between getOffers requests
-                self.refreshInterval = config["refreshInterval"]
-                self.twilioFromNumber = config["twilioFromNumber"]
-                self.twilioToNumber = config["twilioToNumber"]
-                self.__retryCount = 0
-                self.__rate_limit_number = 1
-                self.__acceptedOffers = []
-                self.__startTimestamp = time.time()
-                self.__requestHeaders = FlexUnlimited.allHeaders.get(
-                    "FlexCapacityRequest")
-                self.refreshToken = config["refreshToken"]
-                self.accessToken = config["accessToken"]
-                self.session = requests.Session()
+            if settings is not None:
+                self.username = settings["username"]
+                self.password = settings["password"]
+                arrayalmacenes = [almacen['value']
+                                  for almacen in settings.get('desiredwarehouses', [])]
+                self.desiredWarehouses = arrayalmacenes
+                self.minBlockRate = settings["minblockrate"]
+                self.minPayRatePerHour = settings["minpayrateperhour"]
+                self.arrivalBuffer = settings["arrivalbuffer"]
 
-                desiredWeekdays = config["desiredWeekdays"]
+                with open("config.json") as configFile:
+                    config = json.load(configFile)
+                    # start time in military time
+                    self.desiredStartTime = config["desiredStartTime"]
+                    # end time in military time
+                    self.desiredEndTime = config["desiredEndTime"]
+                    self.desiredWeekdays = set()
+                    # number of jobs retrieval requests to perform
+                    self.retryLimit = config["retryLimit"]
+                    # sets delay in between getOffers requests
+                    self.refreshInterval = config["refreshInterval"]
+                    self.twilioFromNumber = config["twilioFromNumber"]
+                    self.twilioToNumber = config["twilioToNumber"]
+                    self.__retryCount = 0
+                    self.__rate_limit_number = 1
+                    self.__acceptedOffers = []
+                    self.__startTimestamp = time.time()
+                    self.__requestHeaders = FlexManager.allHeaders.get(
+                        "FlexCapacityRequest")
+                    self.refreshToken = config["refreshToken"]
+                    self.accessToken = config["accessToken"]
+                    self.session = requests.Session()
 
-                twilioAcctSid = config["twilioAcctSid"]
-                twilioAuthToken = config["twilioAuthToken"]
+                    desiredWeekdays = config["desiredWeekdays"]
+
+                    twilioAcctSid = config["twilioAcctSid"]
+                    twilioAuthToken = config["twilioAuthToken"]
+            else:
+                with open("config_old.json") as configFile:
+                    config = json.load(configFile)
+                    self.username = config["username"]
+                    self.password = config["password"]
+                    self.desiredWarehouses = config["desiredWarehouses"] if len(
+                        config["desiredWarehouses"]) >= 1 else []  # list of warehouse ids
+                    self.minBlockRate = config["minBlockRate"]
+                    self.minPayRatePerHour = config["minPayRatePerHour"]
+                    # arrival buffer in minutes
+                    self.arrivalBuffer = config["arrivalBuffer"]
+                    # start time in military time
+                    self.desiredStartTime = config["desiredStartTime"]
+                    # end time in military time
+                    self.desiredEndTime = config["desiredEndTime"]
+                    self.desiredWeekdays = set()
+                    # number of jobs retrieval requests to perform
+                    self.retryLimit = config["retryLimit"]
+                    # sets delay in between getOffers requests
+                    self.refreshInterval = config["refreshInterval"]
+                    self.twilioFromNumber = config["twilioFromNumber"]
+                    self.twilioToNumber = config["twilioToNumber"]
+                    self.__retryCount = 0
+                    self.__rate_limit_number = 1
+                    self.__acceptedOffers = []
+                    self.__startTimestamp = time.time()
+                    self.__requestHeaders = FlexManager.allHeaders.get(
+                        "FlexCapacityRequest")
+                    self.refreshToken = config["refreshToken"]
+                    self.accessToken = config["accessToken"]
+                    self.session = requests.Session()
+
+                    desiredWeekdays = config["desiredWeekdays"]
+
+                    twilioAcctSid = config["twilioAcctSid"]
+                    twilioAuthToken = config["twilioAuthToken"]
 
         except KeyError as nullKey:
             Log.error(
-                f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.')
+                f'{nullKey} was not set. Please setup FlexManager as described in the README.')
             sys.exit()
         except FileNotFoundError:
             Log.error(
@@ -128,7 +166,7 @@ class FlexUnlimited:
             self.__registerAccount()
 
         self.__requestHeaders["x-amz-access-token"] = self.accessToken
-        self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
+        self.__requestHeaders["X-Amz-Date"] = FlexManager.__getAmzDate()
         self.serviceAreaIds = self.__getEligibleServiceAreas()
         self.__offersRequestBody = {
             "apiVersion": "V2",
@@ -215,7 +253,7 @@ class FlexUnlimited:
             "Accept": "*/*",
             "Accept-Language": "en-US"
         }
-        res = self.session.post(FlexUnlimited.routes.get(
+        res = self.session.post(FlexManager.routes.get(
             "GetAuthToken"), json=amazon_reg_data, headers=reg_headers, verify=True)
         if res.status_code != 200:
             print("login failed")
@@ -237,7 +275,7 @@ class FlexUnlimited:
                 configFile.truncate()
         except KeyError as nullKey:
             Log.error(
-                f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.')
+                f'{nullKey} was not set. Please setup FlexManager as described in the README.')
             sys.exit()
         except FileNotFoundError:
             Log.error(
@@ -283,7 +321,7 @@ class FlexUnlimited:
             "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; Pixel 2 Build/OPM1.171019.021)",
             "x-amzn-identity-auth-domain": "api.amazon.com",
         }
-        res = self.session.post(FlexUnlimited.routes.get(
+        res = self.session.post(FlexManager.routes.get(
             "RequestNewAccessToken"), json=data, headers=headers).json()
         self.accessToken = res['access_token']
         try:
@@ -295,7 +333,7 @@ class FlexUnlimited:
                 configFile.truncate()
         except KeyError as nullKey:
             Log.error(
-                f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.')
+                f'{nullKey} was not set. Please setup FlexManager as described in the README.')
             sys.exit()
         except FileNotFoundError:
             Log.error(
@@ -336,8 +374,8 @@ class FlexUnlimited:
             "requested_token_type": ["bearer", "mac_dms", "website_cookies"]
         }
         try:
-            response: Response = self.session.post(FlexUnlimited.routes.get("GetAuthToken"),
-                                                   headers=FlexUnlimited.allHeaders.get("AmazonApiRequest"), json=payload).json()
+            response: Response = self.session.post(FlexManager.routes.get("GetAuthToken"),
+                                                   headers=FlexManager.allHeaders.get("AmazonApiRequest"), json=payload).json()
             return response.get("response").get("success").get("tokens").get("bearer").get("access_token")
         except Exception as e:
             twoStepVerificationChallengeUrl = self.__getTwoStepVerificationChallengeUrl(
@@ -365,28 +403,28 @@ class FlexUnlimited:
         return datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
 
     def __getEligibleServiceAreas(self):
-        self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
+        self.__requestHeaders["X-Amz-Date"] = FlexManager.__getAmzDate()
         response = self.session.get(
-            FlexUnlimited.routes.get("GetEligibleServiceAreas"),
+            FlexManager.routes.get("GetEligibleServiceAreas"),
             headers=self.__requestHeaders)
         if response.status_code == 403:
             self.__getFlexAccessToken()
             response = self.session.get(
-                FlexUnlimited.routes.get("GetEligibleServiceAreas"),
+                FlexManager.routes.get("GetEligibleServiceAreas"),
                 headers=self.__requestHeaders
             )
         return response.json().get("serviceAreaIds")
 
     def getAllServiceAreas(self):
-        self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
+        self.__requestHeaders["X-Amz-Date"] = FlexManager.__getAmzDate()
         response = self.session.get(
-            FlexUnlimited.routes.get("GetOfferFiltersOptions"),
+            FlexManager.routes.get("GetOfferFiltersOptions"),
             headers=self.__requestHeaders
         )
         if response.status_code == 403:
             self.__getFlexAccessToken()
             response = self.session.get(
-                FlexUnlimited.routes.get("GetOfferFiltersOptions"),
+                FlexManager.routes.get("GetOfferFiltersOptions"),
                 headers=self.__requestHeaders
             )
 
@@ -399,19 +437,12 @@ class FlexUnlimited:
                 [serviceArea["serviceAreaName"], serviceArea["serviceAreaId"]])
         return serviceAreasTable
 
-    def sendSMS(self, mensaje):
+    def sendSMS(self):
         if self.twilioClient is not None:
             self.twilioClient.messages.create(
                 to=self.twilioToNumber,
                 from_=self.twilioFromNumber,
-                body="Nuevo bloque aceptado: " + mensaje)
-
-    def sendCALL(self):
-        if self.twilioClient is not None:
-            self.twilioClient.calls.create(
-                to=self.twilioToNumber,
-                from_=self.twilioFromNumber,
-                twiml='<Response><Say language="es-ES" voice="Polly.Lupe" >Esta es la inteligencia artificial de BPD Flex. Te asignamos un bloque. Revisa tu app.</Say></Response>')
+                body="Gotzilla come dinosaurios al 100")
 
     def __getOffers(self) -> Response:
         """
@@ -421,13 +452,13 @@ class FlexUnlimited:
         Offers response object
         """
         response = self.session.post(
-            FlexUnlimited.routes.get("GetOffers"),
+            FlexManager.routes.get("GetOffers"),
             headers=self.__requestHeaders,
             json=self.__offersRequestBody)
         if response.status_code == 403:
             self.__getFlexAccessToken()
             response = self.session.post(
-                FlexUnlimited.routes.get("GetOffers"),
+                FlexManager.routes.get("GetOffers"),
                 headers=self.__requestHeaders,
                 json=self.__offersRequestBody)
         return response
@@ -436,22 +467,24 @@ class FlexUnlimited:
         self.__requestHeaders["X-Amz-Date"] = self.__getAmzDate()
 
         request = self.session.post(
-            FlexUnlimited.routes.get("AcceptOffer"),
+            FlexManager.routes.get("AcceptOffer"),
             headers=self.__requestHeaders,
             json={"offerId": offer.id})
 
         if request.status_code == 403:
             self.__getFlexAccessToken()
             request = self.session.post(
-                FlexUnlimited.routes.get("AcceptOffer"),
+                FlexManager.routes.get("AcceptOffer"),
                 headers=self.__requestHeaders,
                 json={"offerId": offer.id})
 
         if request.status_code == 200:
             self.__acceptedOffers.append(offer)
             if self.twilioClient is not None:
-                self.sendSMS(offer.toString())
-                self.sendCALL()
+                self.twilioClient.messages.create(
+                    to=self.twilioToNumber,
+                    from_=self.twilioFromNumber,
+                    body=offer.toString())
             Log.info(f"Successfully accepted an offer.")
         else:
             Log.error(

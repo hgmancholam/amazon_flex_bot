@@ -1,5 +1,6 @@
 from google.cloud import firestore
 
+
 FIREBASE_DATABASE_URL = "https://easyflex-402204-default-rtdb.firebaseio.com"
 # declarar la ruta a mi archivo firebase_config.json
 FIREBASE_CREDENTIALS = "./lib/credentials/firebase_config.json"
@@ -19,6 +20,7 @@ class FirebaseManager:
         for usuario in usuarios_ref:
             usuario_data = usuario.to_dict()
             usuario_id = usuario.id
+            usuario_data['id'] = usuario_id
 
             # Obtener documentos de la subcolección "suscripciones"
             suscripciones_ref = self.db.collection(
@@ -27,18 +29,26 @@ class FirebaseManager:
 
             for suscripcion in suscripciones_ref:
                 suscripcion_data = suscripcion.to_dict()
+                suscripcion_data['id'] = suscripcion.id
                 if suscripcion_data.get("robot") == "flex" and suscripcion_data.get("activo") == True:
                     suscripcion_id = suscripcion.id
-
+                    pagos = []
                     # Obtener documentos de la subcolección "pagos"
                     pagos_ref = self.db.collection(
                         f"usuarios/{usuario_id}/suscripciones/{suscripcion_id}/pagos").get()
-                    pagos = [p.to_dict() for p in pagos_ref]
+                    for p in pagos_ref:
+                        pago_data = p.to_dict()
+                        pago_data['id'] = p.id
+                        pagos.append(pago_data)
 
                     # Obtener documentos de la subcolección "descuentos"
+                    descuentos = []
                     descuentos_ref = self.db.collection(
                         f"usuarios/{usuario_id}/suscripciones/{suscripcion_id}/descuentos").get()
-                    descuentos = [d.to_dict() for d in descuentos_ref]
+                    for d in descuentos_ref:
+                        descuento_data = d.to_dict()
+                        descuento_data['id'] = d.id
+                        descuentos.append(descuento_data)
 
                     suscripcion_data["pagos"] = pagos
                     suscripcion_data["descuentos"] = descuentos
@@ -46,7 +56,50 @@ class FirebaseManager:
 
             usuario_data["suscripciones"] = suscripciones
             usuarios.append(usuario_data)
+        return usuarios
 
-        for usuario in usuarios:
-            # if usuario.suscripciones[0].get("activo") == True and usuario.suscripciones[0].get("settings").get("state") == True:
-            print(usuario)
+    def suscripcionActiva(self, idUsuario, idSuscripcion):
+        botEncendido = False
+        suscripcionActiva = False
+        # print("datos ", idUsuario, idSuscripcion)
+
+        try:
+            usuario_doc = self.db.collection(
+                "usuarios").document(idUsuario).get()
+
+            if usuario_doc.exists:
+                usuario = usuario_doc.to_dict()
+                # Hacer algo con el usuario
+            else:
+                return False
+
+            suscripcion_doc = self.db.collection(
+                f"usuarios/{idUsuario}/suscripciones").document(idSuscripcion).get()
+            if suscripcion_doc.exists:
+                suscripcion = suscripcion_doc.to_dict()
+            else:
+                return False
+
+            suscripcionActiva = suscripcion["activo"]
+            botEncendido = suscripcion["settings"]["botstate"]
+
+            return suscripcionActiva and botEncendido
+        except Exception as e:
+            return False
+
+    def registraSolicitud(self, idUsuario, idSuscripcion):
+        try:
+            # Obtener la referencia del documento
+            suscripcion_ref = self.db.collection(
+                f"usuarios/{idUsuario}/suscripciones").document(idSuscripcion)
+
+            # Obtener la fecha y hora actual del servidor de Firebase
+            timestamp = firestore.SERVER_TIMESTAMP
+
+            # Actualizar el campo ultima_consulta con el timestamp
+            suscripcion_ref.update({
+                "ultima_consulta": timestamp
+            })
+            return True
+        except Exception as e:
+            return False

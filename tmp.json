@@ -1,0 +1,13 @@
+{'password': '12345', 'desiredwarehouses': [
+        {'value': 'b7d9db9f-e4d2-4bf1-be2d-bd8caa8ab519', 'nombre': 'Fullerton Metro Center (PFCR) - Retail Delivery'
+        }
+    ], 'minblockrate': '100', 'botmode': 'pasivo', 'minpayrateperhour': '25', 'desiredweekdays': {'wed': {'end': '17: 00', 'start': '08: 00', 'state': True
+        }, 'sun': {'end': '', 'start': '', 'state': False
+        }, 'tue': {'end': '17: 00', 'start': '08: 00', 'state': True
+        }, 'fri': {'end': '17: 00', 'start': '08: 00', 'state': True
+        }, 'thu': {'end': '17: 00', 'start': '08: 00', 'state': True
+        }, 'mon': {'end': '17: 00', 'start': '08: 00', 'state': True
+        }, 'sat': {'end': '', 'start': '', 'state': False
+        }
+    }, 'arrivalbuffer': '30', 'botstate': 'off', 'username': 'hgmanchola@gmail.com'
+}
