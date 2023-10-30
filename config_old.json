@@ -1,9 +1,9 @@
 {
-  "username": "inannasophisticatedstyle@gmail.com",
-  "password": "Prosperida880319",
-  "minBlockRate": 10,
-  "minPayRatePerHour": 2,
-  "arrivalBuffer": 30,
+  "username": "cesar.pedraza.sanabria@gmail.com",
+  "password": "881219.Cesar",
+  "minBlockRate": 100,
+  "minPayRatePerHour": 24,
+  "arrivalBuffer": 40,
   "desiredWarehouses": [
     "8e34fe29-a71c-4851-a178-8d12a71b37a4",
     "67c9bad7-4477-45a2-8d5d-872aa074b42d",
@@ -54,14 +54,14 @@
     "Thur",
     "Fri",
     "Sat",
-    "Sunday"
+    "Sun"
   ],
-  "retryLimit": 50,
-  "refreshInterval": 10,
+  "retryLimit": 500,
+  "refreshInterval": 30,
   "twilioAcctSid": "ACd344fe0c8216ca15ddc3155987d4049f",
   "twilioAuthToken": "d51b5356528f3cd26a366af114eaac06",
   "twilioFromNumber": "+18335013212",
   "twilioToNumber": "+14046188039",
-  "refreshToken": "Atnr|EwICIOOE6WhP5M4HobyksfUB2C6EIbZmH8O6sTcFCK_I-xkBxfXLtBrIQxRHU70SG5mR2lLiCritDY9xYkQjT8oLUie9IqEYdCvCZhR5kSTo9RqLd6sbte0UFY4EVwWL3dPkLajCm0bnUHPnD1EkL5ZP0xa1Om0ht1S-IzwIYyghCIy9ziOx8V_ncBsg3_nSIAniG0zJvosYOg5WL0wU-5PJ5MsLEVlzlps4F0DKbOFksmYshwD9n_PZj6eQ_70v5mdq-cSEpVe6RVqt79i5V6FC8plbi2JB2gMdkEDZh1s8wLa5GQ",
-  "accessToken": "Atna|EwICIN253US_vFf_hNzlPWQbsSpcpN4xYj7LmJQxaInCQUlx8dreISbjUmTeCoq50B0gwIfTl-Gu1h5fDbwpBwio9FMo6ZzHD4GHPrLmV_0FrPicmHyIXaoQ6_lqWhVMekuFM07DLDdbR5pxpWiMvOn22t_XDKwDMvoVLk49D_5Ga-tdn2JQAzcFAD1UYjQEAAl8LxETSMWdNBiorWZshsqqPIy33wyIkrKcS0rDF07GJyg-Gz7Aukslbwv1K2PjtBfn5rHBoiXp2BnVYLZglOzH3ukI5R75VFP5pOE2XsyuRFlLLXDx-tsxMj2Qma7nLTlR1Nk"
+  "refreshToken": "",
+  "accessToken": ""
 }

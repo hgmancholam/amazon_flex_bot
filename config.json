@@ -1,4 +1,21 @@
 {
+  "username": "cesar.pedraza.sanabria@gmail.com",
+  "password": "881219.Cesar",
+  "minBlockRate": 30,
+  "minPayRatePerHour": 20,
+  "arrivalBuffer": 20,
+  "desiredWarehouses": [
+    "4b122d91-52d2-4099-a803-a2eb1aae64cd",
+    "6c7196b7-d5b9-4255-82db-7583f111aceb",
+    "4fb289c4-2ce4-4ddd-8bde-078c1dbea774",
+    "d4f2aa62-dba8-4ff5-a9da-5f6317344be9",
+    "25cd5dfc-b66f-49a6-b7c4-ee8619b8f3d1",
+    "94611d6a-cf61-4afb-bed1-3392b01f1284",
+    "ce366ad9-a926-4d88-b972-51e5eb916668",
+    "e24e1710-0a76-4a37-9fe4-ab27613da2de",
+    "95fcb9aa-ae3f-40bf-8c6d-b11270a4a480",
+    "8cb9f024-d6af-420b-b1be-efd99d197b50"
+  ],
   "desiredStartTime": "00:00",
   "desiredEndTime": "23:59",
   "desiredWeekdays": [
@@ -8,14 +25,14 @@
     "Thur",
     "Fri",
     "Sat",
-    "Sunday"
+    "Sun"
   ],
-  "retryLimit": 50,
-  "refreshInterval": 10,
+  "retryLimit": 50000,
+  "refreshInterval": 60,
   "twilioAcctSid": "ACd344fe0c8216ca15ddc3155987d4049f",
   "twilioAuthToken": "d51b5356528f3cd26a366af114eaac06",
   "twilioFromNumber": "+18335013212",
   "twilioToNumber": "+14046188039",
-  "refreshToken": "Atnr|EwICIOOE6WhP5M4HobyksfUB2C6EIbZmH8O6sTcFCK_I-xkBxfXLtBrIQxRHU70SG5mR2lLiCritDY9xYkQjT8oLUie9IqEYdCvCZhR5kSTo9RqLd6sbte0UFY4EVwWL3dPkLajCm0bnUHPnD1EkL5ZP0xa1Om0ht1S-IzwIYyghCIy9ziOx8V_ncBsg3_nSIAniG0zJvosYOg5WL0wU-5PJ5MsLEVlzlps4F0DKbOFksmYshwD9n_PZj6eQ_70v5mdq-cSEpVe6RVqt79i5V6FC8plbi2JB2gMdkEDZh1s8wLa5GQ",
-  "accessToken": "Atna|EwICIAYZ7oH7qt7Ucr7ddpB0IqFs_vO32wXxqHrdt7CwxY5655r9Vtn5XaC4OKqKBjOc_LgeGWeF1xGZoXXBgDiZICor5NBrwTXm2BIqhAIN_lCNcpoWvhGjuFYv-xugujW-y84LNrFn0xYnHoqRi-8oHkybiJ8YkwOT3BUP2JOInNBzVGI0Fwp7am0TGdYNG3KL0zchlZrZ0kiXSeUWfoqXrLRH4OwVIvCBXbbsTpzrOUEEXKFIFp_AQBpQDl9SEeZx-Oa1kZspoqL8yaXO8nMnj8qTwwmuXnWqtKKv-0xWJW-Fmkft0ozH2AhqiZb7foq8jz8"
+  "refreshToken": "Atnr|EwICIB9DQIxiyEEPyTWtPvZKVCGwM9CYe4Z2XVQVuuq3NfRPAMuaFDJwA9GY1wkjGgkqxM_gG0xejbXgR5HJxXjQ6AmuCAGVEcaGsQQNwGJpM7AMKb4FJlVTFAFoAocLQ7Dr-H_im-XoQwRhWVT_ubKvY0Dq73jsVICUUfqAS0Ty1quA8wZBUMkcFxOUKueeAD-mZF9AL2I3TrI0P0NN7wZaCBN8Gi0njK1v5m6LeJMjFTHEBb_QiYdFD-V0VzIQfa10QV5nb6NycFmJX61mPuAryTwXsYjnq9b7uAqMlG_5G8orWw",
+  "accessToken": "Atna|EwICINrjjSEeaKwsnrDwRAJVDTOjwvzKf4QK-GMGpdWdFliBccjD-Y0YV8dLtjeJU0Fj4XfQAra7g_lPtdrTvXUSUJVxZ8RiFvcQ33HdrOIORdv6_K-QF_uj8lpuvT-KMFmIOvdkcgKkj5yjHZukxGchJWHeA_GtF8bi1pl2d80c62erKLAN27pTKDbQFFsfhnFWJaG3qLgZrYffjP4Bpzd3CI22onkFQzSk_skYQzZs-2DEmcdqrF-t-dFThvu-nxE9GxhDvVI_zkkOqkA7sF59A2uHxyJVpkGQVrJPcTNRyBu9_EUwz_H6wkcztIUs-s7Np7s"
 }

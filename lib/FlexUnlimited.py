@@ -1,3 +1,4 @@
+
 from lib.Offer import Offer
 from lib.Log import Log
 import requests
@@ -5,6 +6,8 @@ import time
 import os
 import sys
 import json
+import math
+import threading
 from requests.models import Response
 from datetime import datetime
 from prettytable import PrettyTable
@@ -16,6 +19,9 @@ import gzip
 import secrets
 import pyaes
 from pbkdf2 import PBKDF2
+import random
+from discord_webhook import DiscordWebhook
+from anticaptchaofficial.antigatetask import *
 
 try:
     from twilio.rest import Client
@@ -23,7 +29,8 @@ except:
     pass
 
 APP_NAME = "com.amazon.rabbit"
-APP_VERSION = "303338310"
+# APP_VERSION = "303338310"
+APP_VERSION = "3681690"
 DEVICE_NAME = "Le X522"
 MANUFACTURER = "LeMobile"
 OS_VERSION = "LeEco/Le2_NA/le_s2_na:6.0.1/IFXNAOP5801910272S/61:user/release-keys"
@@ -45,7 +52,7 @@ class FlexUnlimited:
             "x-flex-instance-id": "BEEBE19A-FF23-47C5-B1D2-21507C831580",
             "Accept-Language": "en-US",
             "Content-Type": "application/json",
-            "User-Agent": "iOS/16.1 (iPhone Darwin) Model/iPhone Platform/iPhone14,2 RabbitiOS/2.112.2",
+            "User-Agent": "iOS/15.2 (iPhone Darwin) Model/iPhone Platform/iPhone13,3 RabbitiOS/3.88.4",
             "Connection": "keep-alive",
             "Cookie": 'session-id=147-7403990-6925948; session-id-time=2082787201l; '
             'session-token=1mGSyTQU1jEQgpSB8uEn6FFHZ1iBcFpe9V7LTPGa3GV3sWf4bgscBoRKGmZb3TQICu7PSK5q23y3o4zYYhP'
@@ -72,7 +79,7 @@ class FlexUnlimited:
 
     def __init__(self) -> None:
         try:
-            with open("config_old.json") as configFile:
+            with open("config.json") as configFile:
                 config = json.load(configFile)
                 self.username = config["username"]
                 self.password = config["password"]
@@ -102,9 +109,7 @@ class FlexUnlimited:
                 self.refreshToken = config["refreshToken"]
                 self.accessToken = config["accessToken"]
                 self.session = requests.Session()
-
                 desiredWeekdays = config["desiredWeekdays"]
-
                 twilioAcctSid = config["twilioAcctSid"]
                 twilioAuthToken = config["twilioAuthToken"]
 
@@ -215,6 +220,7 @@ class FlexUnlimited:
             "Accept": "*/*",
             "Accept-Language": "en-US"
         }
+
         res = self.session.post(FlexUnlimited.routes.get(
             "GetAuthToken"), json=amazon_reg_data, headers=reg_headers, verify=True)
         if res.status_code != 200:
@@ -319,7 +325,7 @@ class FlexUnlimited:
                 "domain": "Device",
                 "app_version": "0.0",
                 "device_type": "A3NWHXTQ4EBCZS",
-                "os_version": "15.2",
+                "os_version": "17",
                 "device_serial": "0000000000000000",
                 "device_model": "iPhone",
                 "app_name": "Amazon Flex",
@@ -453,31 +459,92 @@ class FlexUnlimited:
                 self.sendSMS(offer.toString())
                 self.sendCALL()
             Log.info(f"Successfully accepted an offer.")
+            self.__solveCaptcha()
+        elif request.status_code == 420:
+            Log.error(
+                f"Error 420. Waiting 60 minutes. {request.status_code}")
+            time.sleep(self.refreshInterval)
+        elif request.status_code == 307:
+            self.__solveCaptcha()
+            Log.error("Unable to accept offer solve captcha invoked")
         else:
             Log.error(
                 f"Unable to accept an offer. Request returned status code {request.status_code}")
 
+    def __solveCaptcha(self):
+        Log.info("Trying bypass captach.")
+
+        solver = antigateTask()
+        solver.set_verbose(1)
+        solver.set_key(self.antiCaptchaToken)
+        solver.set_website_url(
+            "https://www.amazon.com/aaut/verify/flex-offers/challenge?challengeType=ARKOSE_LEVEL_2&returnTo=https://www.amazon.com&headerFooter=false")
+        solver.set_template_name("Amazon uniqueValidationId")
+        solver.set_variables({})
+
+        balance = solver.get_balance()
+
+        if balance < 0.10:
+            Log.error(f"Anti-Captcha balance is {balance}")
+
+            if balance <= 0:
+                exit()
+
+        result = solver.solve_and_return_solution()
+        if result != 0:
+
+            parsed_url = urlparse(result["url"])
+            query_params = parse_qs(parsed_url.query)
+            session_token = query_params.get('sessionToken', [None])[0]
+            decoded_session_token = unquote(session_token)
+
+            payload = json.dumps({
+                'challengeToken': decoded_session_token
+            })
+            ValidateChallenge = requests.request(
+                "POST", "https://flex-capacity-na.amazon.com/ValidateChallenge", headers=self.__requestHeaders, data=payload)
+
+            if ValidateChallenge.status_code == 200:
+                Log.info("Captcha passed!")
+                solver.report_correct_recaptcha()
+            else:
+                Log.error("Reporting incorrect captcha.")
+                solver.report_incorrect_recaptcha()
+                self.__solveCaptcha()
+
+        else:
+            Log.error(f"Task finished with error {solver.error_code}")
+
     def __processOffer(self, offer: Offer):
+        print(f"** Validating offer with your constrains.\n")
+        print(datetime.now())
+        Log.info("Offer to validate:")
         Log.info(offer.toString())
-        print(f"** Validating offer with your constrains.\n\n")
         if offer.hidden:
+            print(f"** NO - Offer is hidden.")
             return
         if self.desiredWeekdays:
             if offer.weekday not in self.desiredWeekdays:
+                print(f"** NO - Selected days does not match.")
                 return
 
         if self.minBlockRate:
             if offer.blockRate < self.minBlockRate:
+                print(f"** NO - Block rate do not match.")
                 return
 
         if self.minPayRatePerHour:
             if offer.ratePerHour < self.minPayRatePerHour:
+                print(f"** NO - Minimum pay rate per hour do not match.")
                 return
 
         if self.arrivalBuffer:
             deltaTime = (offer.startTime - datetime.now()).seconds / 60
             if deltaTime < self.arrivalBuffer:
+                print(f"** NO - Arrival buffer do not match.")
                 return
+
+        print(f"** YES - Offer matches all constrains.")
 
         self.__acceptOffer(offer)
 
@@ -510,7 +577,9 @@ class FlexUnlimited:
             else:
                 Log.error(offersResponse.json())
                 break
+
             time.sleep(self.refreshInterval)
+
         Log.info("Job search cycle ending...")
         Log.info(
             f"Accepted {len(self.__acceptedOffers)} offers in {time.time() - self.__startTimestamp} seconds")
